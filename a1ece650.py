@@ -17,10 +17,13 @@ error_msg = {
 # ------------global data#
 
 
+def update():
+    print ""
+
 def storeIntoPubPoints((x, y), l):
     i = 0
     for t in l:
-        if (t[0] == x and t[1] == y) or (t[1] == x and t[0] == y):
+        if t[0] == x and t[1] == y:
             return i
         i += 1
     l.append((x, y))
@@ -34,25 +37,38 @@ def dis((x1, y1), (x2, y2)):
 def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
     # COMMON POINT
     # check if points are x-same -> []
-    if x1 == x2 or x3 == x4:
+    if x1 == x2 and x3 == x4:
         return []
-    # edge 1
-    a1 = (y2 - y1) / (x2 - x1)
-    b1 = y1 - a1 * x1
-    # edge 2
-    a2 = (y4 - y3) / (x4 - x3)
-    b2 = y3 - a2 * x3
-    # check if points are y-same -> []
-    if a1 == 0 or a2 == 0:
-        return []
-    print a1, ' & ', b1
-    print a2, ' & ', b2
-    # check if a are the same -> []
-    if a1 == a2:
-        return []
-    x = (b2 - b1) / (a1 - a2)
-    y = a1 * x + b1
-    print x, ' , ', y
+    elif x1 == x2 and x3 != x4:
+        # edge 2
+        a2 = (y4 - y3) / (x4 - x3)
+        b2 = y3 - a2 * x3
+        x = x1
+        y = a2 * x + b2
+    elif x1 != x2 and x3 == x4:
+        # edge 1
+        a1 = (y2 - y1) / (x2 - x1)
+        b1 = y1 - a1 * x1
+        x = x3
+        y = a1 * x + b1
+    else:
+        # edge 1
+        a1 = (y2 - y1) / (x2 - x1)
+        b1 = y1 - a1 * x1
+        # edge 2
+        a2 = (y4 - y3) / (x4 - x3)
+        b2 = y3 - a2 * x3
+        # check if points are a-same -> []
+        if a1 == a2:
+            return []
+        print a1, ' & ', b1
+        print a2, ' & ', b2
+        # check if a are the same -> []
+        if a1 == a2:
+            return []
+        x = (b2 - b1) / (a1 - a2)
+        y = a1 * x + b1
+        print x, ' , ', y
 
     # DISTANCE CHECK
     # check if dx1>d1, dx2>d1, dx3>d2, dx4>d2 -> []
@@ -68,9 +84,6 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
         return []
     return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x, y)]
 
-
-def update():
-    print("update() function not implemented!")
 
 
 def add(line):
@@ -187,8 +200,6 @@ def parseline(instr):
 
 
 def masterCode():
-    # YOUR MAIN CODE GOES HERE
-    #
     # sample code to read from stdin.
     # make sure to remove all spurious print statements as required
     # by the assignment
@@ -208,17 +219,17 @@ def masterCode():
 
 
 def testCode():
-    A = (0.0, -1.0)
-    B = (1.0, 0.0)
-    C = (-1.0, 0.0)
-    D = (0.0, 0.5)
-    storeIntoPubPoints(A, pubPoints)
-    storeIntoPubPoints(B, pubPoints)
-    storeIntoPubPoints(C, pubPoints)
-    storeIntoPubPoints(D, pubPoints)
-    # print intersectCal(A, B, C, D)
+    A = (3.0, 8.0)
+    B = (5.0, 6.0)
+    C = (4.0, 2.0)
+    D = (4.0, 8.0)
+    # storeIntoPubPoints(A, pubPoints)
+    # storeIntoPubPoints(B, pubPoints)
+    # storeIntoPubPoints(C, pubPoints)
+    # storeIntoPubPoints(D, pubPoints)
+    print intersectCal(A, B, C, D)
     print pubPoints
-    print storeIntoPubPoints(B, pubPoints)
+    #print storeIntoPubPoints(B, pubPoints)
 
 def main():
     # masterCode()
