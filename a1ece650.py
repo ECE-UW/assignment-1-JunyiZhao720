@@ -18,16 +18,16 @@ error_msg = {
 
 
 def update():
-    print ""
+    # update the new edges based on streetDic
+    storeEdges()
+    print edgeDic
 
-def storeIntoPubPoints((x, y), l):
-    i = 0
-    for t in l:
-        if t[0] == x and t[1] == y:
-            return i
-        i += 1
-    l.append((x, y))
-    return i
+
+def storeEdges():
+    for key in streetDic.keys():
+        edgeDic[key] = []
+        for i in range(len(streetDic[key]) - 1):
+            edgeDic[key].append((streetDic[key][i], streetDic[key][i+1]))
 
 
 def dis((x1, y1), (x2, y2)):
@@ -88,7 +88,7 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
 
 def add(line):
     # check format
-    if len(line) != 3 or line[2] == '':
+    if len(line) != 3 or line[2] == '' or len(line[2]) == 0:
         print error_msg['format']
         return
     # check if the name already exists
@@ -102,7 +102,7 @@ def add(line):
 
 def change(line):
     # check format
-    if len(line) != 3 or line[2] == '':
+    if len(line) != 3 or line[2] == '' or len(line[2]) == 0:
         print error_msg['format']
         return
     # check if the name exists
@@ -125,6 +125,7 @@ def remove(line):
         return
     # adding
     del streetDic[line[1]]
+    del edgeDic[line[1]]
     update()
 
 
@@ -169,7 +170,7 @@ def parseline(instr):
     # check if tuple num is 2 -> []
     line = line[i:]
     if line == '':
-        return []
+        return [cmd, street]
     cameras = []
     open_bracket = False
     s = ''
@@ -205,15 +206,13 @@ def masterCode():
     # by the assignment
     while True:
         line = parseline(sys.stdin.readline())
+        print len(line)
         if len(line) > 3 or len(line) == 0:
             print error_msg['format']
             continue
-
-        print line
         cmd = line[0]
         if cmd in options:
             options[cmd](line)
-            print streetDic
         else:
             print error_msg['cmd']
 
@@ -232,8 +231,8 @@ def testCode():
     #print storeIntoPubPoints(B, pubPoints)
 
 def main():
-    # masterCode()
-    testCode()
+    masterCode()
+    # testCode()
 
 
 
