@@ -1,10 +1,13 @@
 import math
-
+import sys
 # YOUR CODE GOES HERE
 
 
 # global data----------- #
 streetDic = {}
+pubPoints = []
+edgeDic = {}
+
 error_msg = {
     'cmd': 'Error: Commands not found! We only support a,c,r,g!',
     'format': 'Error: Please follow the format: <command> <street name> <(x,y)>',
@@ -12,6 +15,16 @@ error_msg = {
     'noKeys': 'Error: The street name does not exist.'
 }
 # ------------global data#
+
+
+def storeIntoPubPoints((x, y), l):
+    i = 0
+    for t in l:
+        if (t[0] == x and t[1] == y) or (t[1] == x and t[0] == y):
+            return i
+        i += 1
+    l.append((x, y))
+    return i
 
 
 def dis((x1, y1), (x2, y2)):
@@ -173,31 +186,44 @@ def parseline(instr):
     return [cmd, street, cameras]
 
 
-def main():
+def masterCode():
     # YOUR MAIN CODE GOES HERE
-
+    #
     # sample code to read from stdin.
     # make sure to remove all spurious print statements as required
     # by the assignment
-    # while True:
-    #     line = parseline(sys.stdin.readline())
-    #     if len(line) > 3 or len(line) == 0:
-    #         print error_msg['format']
-    #         continue
-    #
-    #     print line
-    #     cmd = line[0]
-    #     if cmd in options:
-    #         options[cmd](line)
-    #         print streetDic
-    #     else:
-    #         print error_msg['cmd']
-    #
+    while True:
+        line = parseline(sys.stdin.readline())
+        if len(line) > 3 or len(line) == 0:
+            print error_msg['format']
+            continue
+
+        print line
+        cmd = line[0]
+        if cmd in options:
+            options[cmd](line)
+            print streetDic
+        else:
+            print error_msg['cmd']
+
+
+def testCode():
     A = (0.0, -1.0)
     B = (1.0, 0.0)
     C = (-1.0, 0.0)
     D = (0.0, 0.5)
-    print intersectCal(A, B, C, D)
+    storeIntoPubPoints(A, pubPoints)
+    storeIntoPubPoints(B, pubPoints)
+    storeIntoPubPoints(C, pubPoints)
+    storeIntoPubPoints(D, pubPoints)
+    # print intersectCal(A, B, C, D)
+    print pubPoints
+    print storeIntoPubPoints(B, pubPoints)
+
+def main():
+    # masterCode()
+    testCode()
+
 
 
 if __name__ == '__main__':
