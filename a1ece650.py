@@ -20,6 +20,28 @@ error_msg = {
 def update():
     # update the new edges based on streetDic
     storeEdges()
+    # initialize dic for visit check
+    visited = {}
+    for key in streetDic.keys():
+        visited[key] = False
+
+    # MAIN LOOP
+    for key1 in edgeDic.keys():
+        visited[key1] = True
+        for key2 in edgeDic.keys():
+            if visited[key2]:
+                continue
+            for entry1 in edgeDic[key1]:
+                for entry2 in edgeDic[key2]:
+                    result = intersectCal(entry1[0], entry1[1], entry2[0], entry2[1])
+                    edgeDic[key1].remove(entry1)
+                    # if emtpy
+                    if result:
+                        continue
+                    # found new dots
+                    else:
+                        # edgeDic[key1].append((result[0], result[4]), (result[1], result[4]))
+
     print edgeDic
 
 
