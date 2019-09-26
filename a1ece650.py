@@ -87,7 +87,6 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
     return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x, y)]
 
 
-
 def add(line):
     # check format
     if len(line) != 3 or line[2] == '' or len(line[2]) == 0:
@@ -138,12 +137,18 @@ def graph(line):
         visited[key] = False
 
     # MAIN LOOP
+    i = 0
     for current_key in edgeDic.keys():
         visited[current_key] = True
+        # check if it is the last key
+        # if i >= len(edgeDic.keys()) - 1:
+        #     break
         current_list = []
         for current_edge in edgeDic[current_key]:
             for compared_key in edgeDic.keys():
-                if visited[compared_key]:
+                # if visited[compared_key]:
+                #     continue
+                if compared_key == current_key:
                     continue
                 compared_list = edgeDic[compared_key][:]
                 for compared_edge in edgeDic[compared_key]:
@@ -153,8 +158,8 @@ def graph(line):
                         continue
                     # found new dots
                     else:
-                        print 'New dots found!'
-                        print 'result: ', result
+                        # print 'New dots found!'
+                        # print 'result: ', result
                         entry11 = (result[0], result[4])
                         entry12 = (result[4], result[1])
                         entry21 = (result[2], result[4])
@@ -168,12 +173,28 @@ def graph(line):
                             compared_list.append(entry21)
                         if entry22[0] != entry22[1]:
                             compared_list.append(entry22)
-                        print 'current_list:', current_list
-                        print 'compared_list', compared_list
+                        # print 'current_list:', current_list
+                        # print 'compared_list', compared_list
                 edgeDic[compared_key] = compared_list
         edgeDic[current_key] = current_list
+        i += 1
 
-    print edgeDic
+    # ELIMINATE DUPLICATION
+    for key in edgeDic.keys():
+        edgeDic[key] = list(dict.fromkeys(edgeDic[key]))
+
+    # EXTRACT VERTICES
+    for key in edgeDic.keys():
+        current_list = []
+        for edge in edgeDic[key]:
+            if edge[0] not in current_list:
+                current_list.append(edge[0])
+            if edge[1] not in current_list:
+                current_list.append(edge[1])
+        streetDic[key] = current_list
+
+    print 'Processed edge:', edgeDic
+    print 'Processed dots:', streetDic
 
 
 # global constant----------- #
