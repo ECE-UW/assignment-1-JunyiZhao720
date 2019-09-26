@@ -166,8 +166,8 @@ def graph(line):
     for key in edgeDic.keys():
         edgeDic[key] = list(dict.fromkeys(edgeDic[key]))
 
-    print 'Processed edge:', edgeDic
-    print 'Processed dots:', streetDic
+    # print 'Processed edge:', edgeDic
+    # print 'Processed dots:', streetDic
 
     # EXTRACT VERTICES
     # store vertices for both easy for edge and vertex output
@@ -202,12 +202,21 @@ def graph(line):
         print ' ', vertex_dic[key], ': ', key
     print '}'
     print 'E = {'
+    i = 0
+    j = 0
     for key in edgeDic.keys():
         for edge in edgeDic[key]:
-            print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>,'
+            if i != len(edgeDic.keys()) - 1 or j != len(edgeDic[key]) - 1:
+                print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>,'
+            else:
+                print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>'
+            j += 1
+        i += 1
+        j = 0
     print '}'
-    print vertex_dic
-    print pubPoints
+    # print vertex_dic
+    # print pubPoints
+
 
 # global constant----------- #
 options = {'a': add, 'c': change, 'r': remove, 'g': graph}
