@@ -5,7 +5,7 @@ import sys
 
 # global data----------- #
 streetDic = {}
-pubPoints = []
+pubPoints = {}
 edgeDic = {}
 
 error_msg = {
@@ -70,7 +70,6 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
                 return []
         x = (b2 - b1) / (a1 - a2)
         y = a1 * x + b1
-    print x, ' , ', y
 
     # DISTANCE CHECK
     # check if dx1>d1, dx2>d1, dx3>d2, dx4>d2 -> []
@@ -173,33 +172,42 @@ def graph(line):
     # EXTRACT VERTICES
     # store vertices for both easy for edge and vertex output
     vertex_dic = {}
-    vertex_list = []
     i = 1
     for key in edgeDic.keys():
         for edge in edgeDic[key]:
-            if edge[0] not in vertex_dic.keys():
+            if edge[0] not in pubPoints.values():
+                while i in pubPoints.keys():
+                    i += 1
+                pubPoints[i] = edge[0]
                 vertex_dic[edge[0]] = i
-                vertex_list.append(edge[0])
-                i += 1
-            if edge[1] not in vertex_dic.keys():
+            else:  # store current dots and find its previous index
+                for k, v in pubPoints.items():
+                    # print 'trying to find:', v,  ' with ', edge[0]
+                    if v == edge[0]:
+                        vertex_dic[edge[0]] = k
+            if edge[1] not in pubPoints.values():
+                while i in pubPoints.keys():
+                    i += 1
+                pubPoints[i] = edge[1]
                 vertex_dic[edge[1]] = i
-                vertex_list.append(edge[1])
-                i += 1
+            else:  # store current dots and find its previous index
+                for k, v in pubPoints.items():
+                    # print 'trying to find:', v, ' with ', edge[1]
+                    if v == edge[1]:
+                        vertex_dic[edge[1]] = k
 
     # OUTPUT
     print 'V = {'
-    for i in range(len(vertex_list)):
-        print ' ', i+1, ': ', vertex_list[i]
+    for key in vertex_dic:
+        print ' ', vertex_dic[key], ': ', key
     print '}'
     print 'E = {'
     for key in edgeDic.keys():
         for edge in edgeDic[key]:
             print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>,'
-
     print '}'
-
-
-
+    print vertex_dic
+    print pubPoints
 
 # global constant----------- #
 options = {'a': add, 'c': change, 'r': remove, 'g': graph}
