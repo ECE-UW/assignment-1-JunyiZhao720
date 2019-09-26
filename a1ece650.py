@@ -20,29 +20,7 @@ error_msg = {
 def update():
     # update the new edges based on streetDic
     storeEdges()
-    # initialize dic for visit check
-    visited = {}
-    for key in streetDic.keys():
-        visited[key] = False
-
-    # MAIN LOOP
-    for key1 in edgeDic.keys():
-        visited[key1] = True
-        for key2 in edgeDic.keys():
-            if visited[key2]:
-                continue
-            for entry1 in edgeDic[key1]:
-                for entry2 in edgeDic[key2]:
-                    result = intersectCal(entry1[0], entry1[1], entry2[0], entry2[1])
-                    edgeDic[key1].remove(entry1)
-                    # if emtpy
-                    if result:
-                        continue
-                    # found new dots
-                    else:
-                        # edgeDic[key1].append((result[0], result[4]), (result[1], result[4]))
-
-    print edgeDic
+    print streetDic
 
 
 def storeEdges():
@@ -50,6 +28,8 @@ def storeEdges():
         edgeDic[key] = []
         for i in range(len(streetDic[key]) - 1):
             edgeDic[key].append((streetDic[key][i], streetDic[key][i+1]))
+
+    print edgeDic
 
 
 def dis((x1, y1), (x2, y2)):
@@ -80,17 +60,17 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
         # edge 2
         a2 = (y4 - y3) / (x4 - x3)
         b2 = y3 - a2 * x3
-        # check if points are a-same -> []
-        if a1 == a2:
-            return []
-        print a1, ' & ', b1
-        print a2, ' & ', b2
         # check if a are the same -> []
         if a1 == a2:
-            return []
+            if x2 == x3 and y2 == y3:
+                return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x2, y2)]
+            elif x1 == x4 and y1 == y4:
+                return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
+            else:
+                return []
         x = (b2 - b1) / (a1 - a2)
         y = a1 * x + b1
-        print x, ' , ', y
+    print x, ' , ', y
 
     # DISTANCE CHECK
     # check if dx1>d1, dx2>d1, dx3>d2, dx4>d2 -> []
@@ -100,8 +80,8 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
     dx2 = dis((x, y), (x2, y2))
     dx3 = dis((x, y), (x3, y3))
     dx4 = dis((x, y), (x4, y4))
-    print d1, d2
-    print dx1, dx2, dx3, dx4
+    # print d1, d2
+    # print dx1, dx2, dx3, dx4
     if dx1 > d1 or dx2 > d1 or dx3 > d2 or dx4 > d2:
         return []
     return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x, y)]
@@ -152,7 +132,48 @@ def remove(line):
 
 
 def graph(line):
-    print("graph() function not implemented!")
+    # initialize dic for visit check
+    visited = {}
+    for key in streetDic.keys():
+        visited[key] = False
+
+    # MAIN LOOP
+    for current_key in edgeDic.keys():
+        visited[current_key] = True
+        current_list = []
+        for current_edge in edgeDic[current_key]:
+            for compared_key in edgeDic.keys():
+                if visited[compared_key]:
+                    continue
+                compared_list = edgeDic[compared_key][:]
+                for compared_edge in edgeDic[compared_key]:
+                    result = intersectCal(current_edge[0], current_edge[1], compared_edge[0], compared_edge[1])
+                    # if emtpy
+                    if not result:
+                        continue
+                    # found new dots
+                    else:
+                        print 'New dots found!'
+                        print 'result: ', result
+                        entry11 = (result[0], result[4])
+                        entry12 = (result[4], result[1])
+                        entry21 = (result[2], result[4])
+                        entry22 = (result[4], result[3])
+                        if entry11[0] != entry11[1]:
+                            current_list.append(entry11)
+                        if entry12[0] != entry12[1]:
+                            current_list.append(entry12)
+                        compared_list.remove(compared_edge)
+                        if entry21[0] != entry21[1]:
+                            compared_list.append(entry21)
+                        if entry22[0] != entry22[1]:
+                            compared_list.append(entry22)
+                        print 'current_list:', current_list
+                        print 'compared_list', compared_list
+                edgeDic[compared_key] = compared_list
+        edgeDic[current_key] = current_list
+
+    print edgeDic
 
 
 # global constant----------- #
@@ -217,8 +238,13 @@ def parseline(instr):
                 return []
             cameras.append((float(l[0]), float(l[1])))
         else:
+            # no '(' before actual content
+            if not open_bracket:
+                return []
             s += c
-    # print cmd + ' ' + street + ' ', cameras
+    # no ')' at end
+    if open_bracket:
+        return []
     return [cmd, street, cameras]
 
 
@@ -240,16 +266,15 @@ def masterCode():
 
 
 def testCode():
-    A = (3.0, 8.0)
-    B = (5.0, 6.0)
-    C = (4.0, 2.0)
-    D = (4.0, 8.0)
+    A = (2.0, 2.0)
+    B = (4.0, 4.0)
+    C = (4.0, 4.0)
+    D = (5.0, 5.0)
     # storeIntoPubPoints(A, pubPoints)
     # storeIntoPubPoints(B, pubPoints)
     # storeIntoPubPoints(C, pubPoints)
     # storeIntoPubPoints(D, pubPoints)
     print intersectCal(A, B, C, D)
-    print pubPoints
     #print storeIntoPubPoints(B, pubPoints)
 
 def main():
