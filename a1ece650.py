@@ -131,35 +131,21 @@ def remove(line):
 
 
 def graph(line):
-    # initialize dic for visit check
-    visited = {}
-    for key in streetDic.keys():
-        visited[key] = False
 
     # MAIN LOOP
     i = 0
     for current_key in edgeDic.keys():
-        visited[current_key] = True
-        # check if it is the last key
-        # if i >= len(edgeDic.keys()) - 1:
-        #     break
         current_list = []
         for current_edge in edgeDic[current_key]:
             for compared_key in edgeDic.keys():
-                # if visited[compared_key]:
-                #     continue
                 if compared_key == current_key:
                     continue
                 compared_list = edgeDic[compared_key][:]
                 for compared_edge in edgeDic[compared_key]:
                     result = intersectCal(current_edge[0], current_edge[1], compared_edge[0], compared_edge[1])
-                    # if emtpy
-                    if not result:
+                    if not result:  # if emtpy
                         continue
-                    # found new dots
-                    else:
-                        # print 'New dots found!'
-                        # print 'result: ', result
+                    else:  # found new dots
                         entry11 = (result[0], result[4])
                         entry12 = (result[4], result[1])
                         entry21 = (result[2], result[4])
@@ -173,8 +159,6 @@ def graph(line):
                             compared_list.append(entry21)
                         if entry22[0] != entry22[1]:
                             compared_list.append(entry22)
-                        # print 'current_list:', current_list
-                        # print 'compared_list', compared_list
                 edgeDic[compared_key] = compared_list
         edgeDic[current_key] = current_list
         i += 1
@@ -183,18 +167,38 @@ def graph(line):
     for key in edgeDic.keys():
         edgeDic[key] = list(dict.fromkeys(edgeDic[key]))
 
-    # EXTRACT VERTICES
-    for key in edgeDic.keys():
-        current_list = []
-        for edge in edgeDic[key]:
-            if edge[0] not in current_list:
-                current_list.append(edge[0])
-            if edge[1] not in current_list:
-                current_list.append(edge[1])
-        streetDic[key] = current_list
-
     print 'Processed edge:', edgeDic
     print 'Processed dots:', streetDic
+
+    # EXTRACT VERTICES
+    # store vertices for both easy for edge and vertex output
+    vertex_dic = {}
+    vertex_list = []
+    i = 1
+    for key in edgeDic.keys():
+        for edge in edgeDic[key]:
+            if edge[0] not in vertex_dic.keys():
+                vertex_dic[edge[0]] = i
+                vertex_list.append(edge[0])
+                i += 1
+            if edge[1] not in vertex_dic.keys():
+                vertex_dic[edge[1]] = i
+                vertex_list.append(edge[1])
+                i += 1
+
+    # OUTPUT
+    print 'V = {'
+    for i in range(len(vertex_list)):
+        print ' ', i+1, ': ', vertex_list[i]
+    print '}'
+    print 'E = {'
+    for key in edgeDic.keys():
+        for edge in edgeDic[key]:
+            print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>,'
+
+    print '}'
+
+
 
 
 # global constant----------- #
