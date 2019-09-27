@@ -17,19 +17,11 @@ error_msg = {
 # ------------global data#
 
 
-def update():
-    # update the new edges based on streetDic
-    storeEdges()
-    print streetDic
-
-
 def storeEdges():
     for key in streetDic.keys():
         edgeDic[key] = []
         for i in range(len(streetDic[key]) - 1):
             edgeDic[key].append((streetDic[key][i], streetDic[key][i+1]))
-
-    print edgeDic
 
 
 def dis((x1, y1), (x2, y2)):
@@ -97,7 +89,7 @@ def add(line):
         return
     # adding
     streetDic[line[1]] = line[2]
-    update()
+    storeEdges()
 
 
 def change(line):
@@ -111,7 +103,7 @@ def change(line):
         return
     # adding
     streetDic[line[1]] = line[2]
-    update()
+    storeEdges()
 
 
 def remove(line):
@@ -126,7 +118,7 @@ def remove(line):
     # adding
     del streetDic[line[1]]
     del edgeDic[line[1]]
-    update()
+    storeEdges()
 
 
 def graph(line):
@@ -274,9 +266,7 @@ def parseline(instr):
             l = s.split(',')
             s = ''
             # check if the input length is correct
-            print l
             if len(l) != 2:
-                print "tuple error!", l
                 return []
             cameras.append((float(l[0]), float(l[1])))
         else:
@@ -296,13 +286,14 @@ def masterCode():
     # by the assignment
     while True:
         line = parseline(sys.stdin.readline())
-        print len(line)
+        # print line
         if len(line) > 3 or len(line) == 0:
             print error_msg['format']
             continue
         cmd = line[0]
         if cmd in options:
             options[cmd](line)
+
         else:
             print error_msg['cmd']
 
@@ -317,7 +308,7 @@ def testCode():
     # storeIntoPubPoints(C, pubPoints)
     # storeIntoPubPoints(D, pubPoints)
     print intersectCal(A, B, C, D)
-    #print storeIntoPubPoints(B, pubPoints)
+    # print storeIntoPubPoints(B, pubPoints)
 
 def main():
     masterCode()
