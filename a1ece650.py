@@ -248,6 +248,11 @@ def parseline(instr):
     if not close_comma:
         return []
 
+    # check street name
+    for c in street:
+        if not c.isalpha():
+            return []
+
     # PARSE VERTEX
     # check if street name is empty -> []
     # check if error brackets '(( or ))' -> []
