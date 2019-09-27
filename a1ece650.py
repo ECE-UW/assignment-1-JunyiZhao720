@@ -12,7 +12,7 @@ error_msg = {
     'cmd': 'Error: Commands not found! We only support a,c,r,g!',
     'format': 'Error: Please follow the format: <command> <street name> <(x,y)>',
     'keys': 'Error: The street name already exists. Please re-enter the name or change existing one.',
-    'noKeys': 'Error: The street name does not exist.'
+    'noKeys': 'Error: \'c\' or \'r\' specified for a street that does not exist.'
 }
 # ------------global data#
 
@@ -233,19 +233,26 @@ def parseline(instr):
         return [cmd]
 
     # PARSE STREET NAME
+    if line[0] != '"':
+        return []
+    line = line[1:]
     i = 0
     street = ''
+    close_comma = False
     for c in line:
-        if c == '(':
+        if c == '"':
+            close_comma = True
             break
         street += c
         i += 1
+    if not close_comma:
+        return []
 
     # PARSE VERTEX
     # check if street name is empty -> []
     # check if error brackets '(( or ))' -> []
     # check if tuple num is 2 -> []
-    line = line[i:]
+    line = line[i+1:]
     if line == '':
         return [cmd, street]
     cameras = []
@@ -293,7 +300,7 @@ def masterCode():
         cmd = line[0]
         if cmd in options:
             options[cmd](line)
-
+            # print
         else:
             print error_msg['cmd']
 
