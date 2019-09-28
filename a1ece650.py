@@ -1,5 +1,6 @@
 import math
 import sys
+import re
 # YOUR CODE GOES HERE
 
 
@@ -216,80 +217,58 @@ options = {'a': add, 'c': change, 'r': remove, 'g': graph}
 # ------------global constant#
 
 
-def parseline(instr):
-    line = instr.strip().replace(' ', '')
-    if line == '':
-        return []
-
-    # PARSE COMMAND
-    # check if cmd is empty -> []
-    # check if cmd is known commands -> []
-    # check if lines after cmd are emtpy -> [cmd]
-    cmd = line[0]
-    line = line[1:]
-    if cmd not in options.keys():
-        return []
-    if line == '':
-        return [cmd]
-
-    # PARSE STREET NAME
-    if line[0] != '"':
-        return []
-    line = line[1:]
-    i = 0
-    street = ''
-    close_comma = False
-    for c in line:
-        if c == '"':
-            close_comma = True
-            break
-        street += c
-        i += 1
-    if not close_comma:
-        return []
-
-    # check street name
-    for c in street:
-        if not c.isalpha():
+def parseLineRex(data):
+    cmd_single = re.compile(r'^[a-z]$')
+    cmd_double = re.compile(r'^([a-z]) "([a-zA-Z ]+)"$')
+    cmd_triple = re.compile(r'^([a-z]) "([a-zA-Z ]+)" (.+)')
+    line_pattern = re.compile(r'\(([-\d]+,[-\d]+)\)')
+    matches1 = cmd_single.findall(data)
+    if matches1:
+        return matches1
+    matches2 = cmd_double.findall(data)
+    if matches2:
+        return matches2[0]
+    matches3 = cmd_triple.findall(data)
+    if matches3:
+        line = matches3[0][2]
+        line = line.strip().replace(' ', '')
+        li = line_pattern.findall(line)
+        if not line:
             return []
 
-    # PARSE VERTEX
-    # check if street name is empty -> []
-    # check if error brackets '(( or ))' -> []
-    # check if tuple num is 2 -> []
-    line = line[i+1:]
-    if line == '':
+        return [matches3[0][0], matches3[0][1], li]
+        # return matches3[0][2]
+
+
+def parseline(instr):
+    lines = parseLineRex(instr)
+    if not lines:
+        return []
+    if len(lines) == 1:
+        cmd = lines[0]
+        return [cmd]
+    elif len(lines) == 2:
+        cmd = lines[0]
+        street = lines[1]
+        street = street.lower()
         return [cmd, street]
-    cameras = []
-    open_bracket = False
-    s = ''
-    for c in line:
-        if c == '(':
-            # continuous two '('
-            if open_bracket:
-                return []
-            open_bracket = True
-            continue
-        elif c == ')':
-            # continuous two ')'
-            if not open_bracket:
-                return []
-            open_bracket = False
-            l = s.split(',')
-            s = ''
+    elif len(lines) == 3:
+        cmd = lines[0]
+        street = lines[1]
+        street = street.lower()
+        line = lines[2]
+        # HANDLE CAMERAS
+        cameras = []
+        for dot in line:
+            l = dot.split(',')
             # check if the input length is correct
             if len(l) != 2:
                 return []
             cameras.append((float(l[0]), float(l[1])))
-        else:
-            # no '(' before actual content
-            if not open_bracket:
-                return []
-            s += c
-    # no ')' at end
-    if open_bracket:
+
+        return [cmd, street, cameras]
+    else:
         return []
-    return [cmd, street, cameras]
 
 
 def masterCode():
@@ -305,7 +284,6 @@ def masterCode():
         cmd = line[0]
         if cmd in options:
             options[cmd](line)
-            # print
         else:
             print error_msg['cmd']
 
@@ -315,11 +293,29 @@ def testCode():
     B = (4.0, 4.0)
     C = (4.0, 4.0)
     D = (5.0, 5.0)
+    strings = [
+        "a",
+        "aa",
+        "b ",
+        "C",
+        "d \"\"",
+        "e \"street name \"",
+        "f \"street name1 \"",
+        "g\"street name \"",
+        "h \"street name \" (3,1)",
+        "i \"street name \"(3,2)",
+        r'a "Weber Street" (2,-1) (2,2) (5,5) (5,6) (3,8)',
+        r'a "King Street S" (4,2) (4,8)',
+        r'a "Davenport Road" (1,4) (5,8)'
+
+    ]
+    for str in strings:
+        print parseLineRex(str)
     # storeIntoPubPoints(A, pubPoints)
     # storeIntoPubPoints(B, pubPoints)
     # storeIntoPubPoints(C, pubPoints)
     # storeIntoPubPoints(D, pubPoints)
-    print intersectCal(A, B, C, D)
+    # print intersectCal(A, B, C, D)
     # print storeIntoPubPoints(B, pubPoints)
 
 def main():
