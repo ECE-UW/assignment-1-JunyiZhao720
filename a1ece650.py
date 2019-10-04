@@ -55,9 +55,9 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
         b2 = y3 - a2 * x3
         # check if a are the same -> []
         if a1 == a2:
-            if x2 == x3 and y2 == y3:
+            if x2 >= x3 >= x1 and y2 == y3:
                 return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x2, y2)]
-            elif x1 == x4 and y1 == y4:
+            elif x3 <= x1 <= x4 and y1 == y4:
                 return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
             else:
                 return []
@@ -76,6 +76,9 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
     # print dx1, dx2, dx3, dx4
     if dx1 > d1 or dx2 > d1 or dx3 > d2 or dx4 > d2:
         return []
+    x = round(x, 2)
+    y = round(y, 2)
+
     return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x, y)]
 
 
@@ -158,9 +161,16 @@ def graph(line):
     # ELIMINATE DUPLICATION
     for key in edgeDic.keys():
         edgeDic[key] = list(dict.fromkeys(edgeDic[key]))
+    for key in edgeDic.keys():
+        for edge in edgeDic[key]:
+            for key2 in edgeDic.keys():
+                if key == key2:
+                    continue
+                for edge2 in edgeDic[key2]:
+                    if edge == edge2:
+                        edgeDic[key2].remove(edge2)
 
     # print 'Processed edge:', edgeDic
-    # print 'Processed dots:', streetDic
 
     # EXTRACT VERTICES
     # store vertices for both easy for edge and vertex output
@@ -192,7 +202,7 @@ def graph(line):
     # OUTPUT
     print 'V = {'
     for key in vertex_dic:
-        print ' ', vertex_dic[key], ': ', key
+        print '  {0}:  ({1},{2})'.format(vertex_dic[key], key[0], key[1])
     print '}'
     print 'E = {'
     i = 0
@@ -200,15 +210,15 @@ def graph(line):
     for key in edgeDic.keys():
         for edge in edgeDic[key]:
             if i != len(edgeDic.keys()) - 1 or j != len(edgeDic[key]) - 1:
-                print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>,'
+                print '  <{0},{1}>,'.format(vertex_dic[edge[0]], vertex_dic[edge[1]])
             else:
-                print ' <', vertex_dic[edge[0]], ',', vertex_dic[edge[1]], '>'
+                print '  <{0},{1}>'.format(vertex_dic[edge[0]], vertex_dic[edge[1]])
             j += 1
         i += 1
         j = 0
     print '}'
-    # print vertex_dic
-    # print pubPoints
+    # print 'vertex_dic:', vertex_dic
+    # print 'pubPoints:', pubPoints
 
 
 # global constant----------- #
@@ -219,8 +229,8 @@ options = {'a': add, 'c': change, 'r': remove, 'g': graph}
 
 def parseLineRex(data):
     cmd_single = re.compile(r'^[a-z]$')
-    cmd_double = re.compile(r'^([a-z]) "([a-zA-Z ]+)"$')
-    cmd_triple = re.compile(r'^([a-z]) "([a-zA-Z ]+)" (.+)')
+    cmd_double = re.compile(r'^([a-z]) +"([a-zA-Z ]+)"$')
+    cmd_triple = re.compile(r'^([a-z]) +"([a-zA-Z ]+)" +(.+)')
     line_pattern = re.compile(r'\(([-\d]+,[-\d]+)\)')
     matches1 = cmd_single.findall(data)
     if matches1:
@@ -276,7 +286,11 @@ def masterCode():
     # make sure to remove all spurious print statements as required
     # by the assignment
     while True:
-        line = parseline(sys.stdin.readline())
+        line = sys.stdin.readline()
+        if line == '' or line == '\x04' or line == '\x04\n':
+            sys.exit()
+        line = parseline(line)
+
         # print line
         if len(line) > 3 or len(line) == 0:
             print error_msg['format']
@@ -318,10 +332,10 @@ def testCode():
     # print intersectCal(A, B, C, D)
     # print storeIntoPubPoints(B, pubPoints)
 
+
 def main():
     masterCode()
     # testCode()
-
 
 
 if __name__ == '__main__':
