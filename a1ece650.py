@@ -225,6 +225,31 @@ def graph(line):
 options = {'a': add, 'c': change, 'r': remove, 'g': graph}
 
 # ------------global constant#
+# Check basic formats
+def check_basic(data):
+    # Temporary variables
+    openBrace = False
+    commaFound = False
+
+    for theChar in data:
+        if theChar == '(':
+            if openBrace:
+                return False
+            openBrace = True
+        if theChar == ',':
+            if not openBrace or commaFound:
+                return False
+            commaFound = True
+        if theChar == ')':
+            if not openBrace or not commaFound:
+                return False
+            openBrace = False
+            commaFound = False
+    if openBrace:
+        return False
+    else:
+        return True
+
 
 
 def parseLineRex(data):
@@ -242,6 +267,9 @@ def parseLineRex(data):
     if matches3:
         line = matches3[0][2]
         line = line.strip().replace(' ', '')
+        # Check brackets
+        if not check_basic(line):
+            return []
         li = line_pattern.findall(line)
         if not line:
             return []
@@ -303,39 +331,39 @@ def masterCode():
 
 
 def testCode():
-    A = (2.0, 2.0)
-    B = (4.0, 4.0)
-    C = (4.0, 4.0)
-    D = (5.0, 5.0)
-    strings = [
-        "a",
-        "aa",
-        "b ",
-        "C",
-        "d \"\"",
-        "e \"street name \"",
-        "f \"street name1 \"",
-        "g\"street name \"",
-        "h \"street name \" (3,1)",
-        "i \"street name \"(3,2)",
-        r'a "Weber Street" (2,-1) (2,2) (5,5) (5,6) (3,8)',
-        r'a "King Street S" (4,2) (4,8)',
-        r'a "Davenport Road" (1,4) (5,8)'
-
+    strings_test5 = [
+        r'a   "up and across st" ( 0 , 0 )(10,10',
     ]
-    for str in strings:
-        print parseLineRex(str)
-    # storeIntoPubPoints(A, pubPoints)
-    # storeIntoPubPoints(B, pubPoints)
-    # storeIntoPubPoints(C, pubPoints)
-    # storeIntoPubPoints(D, pubPoints)
-    # print intersectCal(A, B, C, D)
-    # print storeIntoPubPoints(B, pubPoints)
+    strings_test8 = [
+        r'a "Weber Street" (2,-1) (2,2) (5,5) (5,6) (3,8)',
+        r'a "King Street S" (3,2) (4,8)',
+        r'a "Davenport Road" (0,0) (5,8)',
+        r'g'
+    ]
+
+    test_strings = strings_test8
+
+    for s in test_strings:
+        line = s
+        if line == '' or line == '\x04' or line == '\x04\n':
+            sys.exit()
+        line = parseline(line)
+
+        # print line
+        if len(line) > 3 or len(line) == 0:
+            print error_msg['format']
+            continue
+        cmd = line[0]
+        if cmd in options:
+            options[cmd](line)
+        else:
+            print error_msg['cmd']
+
 
 
 def main():
-    masterCode()
-    # testCode()
+    # masterCode()
+    testCode()
 
 
 if __name__ == '__main__':
