@@ -76,8 +76,8 @@ def intersectCal((x1, y1), (x2, y2), (x3, y3), (x4, y4)):
     # print dx1, dx2, dx3, dx4
     if dx1 > d1 or dx2 > d1 or dx3 > d2 or dx4 > d2:
         return []
-    x = round(x, 2)
-    y = round(y, 2)
+    x = round(x, 3)
+    y = round(y, 3)
 
     return [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x, y)]
 
@@ -202,7 +202,7 @@ def graph(line):
     # OUTPUT
     print 'V = {'
     for key in vertex_dic:
-        print '  {0}:  ({1},{2})'.format(vertex_dic[key], key[0], key[1])
+        print '  {0}:  ({1},{2})'.format(vertex_dic[key], round(key[0],2), round(key[1],2))
     print '}'
     print 'E = {'
     i = 0
@@ -251,35 +251,32 @@ def check_basic(data):
         return True
 
 
-
-def parseLineRex(data):
+def parseline(instr):
+    lines = []
+    # Parse incoming codes
     cmd_single = re.compile(r'^[a-z]$')
     cmd_double = re.compile(r'^([a-z]) +"([a-zA-Z ]+)"$')
     cmd_triple = re.compile(r'^([a-z]) +"([a-zA-Z ]+)" +(.+)')
     line_pattern = re.compile(r'\(([-\d]+,[-\d]+)\)')
-    matches1 = cmd_single.findall(data)
+    matches1 = cmd_single.findall(instr)
     if matches1:
-        return matches1
-    matches2 = cmd_double.findall(data)
+        lines = matches1
+    matches2 = cmd_double.findall(instr)
     if matches2:
-        return matches2[0]
-    matches3 = cmd_triple.findall(data)
+        lines =  matches2[0]
+    matches3 = cmd_triple.findall(instr)
     if matches3:
         line = matches3[0][2]
         line = line.strip().replace(' ', '')
-        # Check brackets
         if not check_basic(line):
             return []
         li = line_pattern.findall(line)
         if not line:
             return []
 
-        return [matches3[0][0], matches3[0][1], li]
-        # return matches3[0][2]
+        lines = [matches3[0][0], matches3[0][1], li]
 
-
-def parseline(instr):
-    lines = parseLineRex(instr)
+    # Process parsed codes
     if not lines:
         return []
     if len(lines) == 1:
@@ -362,8 +359,8 @@ def testCode():
 
 
 def main():
-    # masterCode()
-    testCode()
+    masterCode()
+    # testCode()
 
 
 if __name__ == '__main__':
